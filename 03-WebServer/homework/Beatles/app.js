@@ -26,7 +26,10 @@ var beatles=[{
 http.createServer((req, res)=>{
   if(req.url === '/'){
     res.writeHead(200, {'Content-Type':'text/html'});
-    var html = fs.readFileSync(__dirname + '/index.html', 'utf8');
+    var html = fs.readFileSync(__dirname + '/index.html', 'utf8', (err, data)=>{
+      if (err) return new Error(err)
+      return data
+    });
     html = html.replace('{john}', beatles[0].name)
     html = html.replace('{paul}', beatles[1].name)
     html = html.replace('{george}', beatles[2].name)
@@ -45,7 +48,18 @@ http.createServer((req, res)=>{
     res.writeHead(200, {'Content-Type':'application/json'})
     res.end(JSON.stringify(beatles))
   }
-  else if (req.url==='/api/John%20Lennon'){
+  else if(req.url.substring(0, 5)==='/api/'){
+    let searchWord = req.url.split('/').pop()
+    let name = searchWord.replace('%20', ' ')
+    let beatleFound = beatles.find((b)=>b.name===name)
+    var html = fs.readFileSync(__dirname + '/beatle.html', 'utf8');
+    html=html.replace('{name}', beatleFound.name)
+    html=html.replace('{text}', beatleFound.birthdate)
+    html=html.replace('{img}', beatleFound.profilePic)
+    res.writeHead(200, {'Content-Type':'text/html'})
+    res.end(html)
+  }
+  /*else if (req.url==='/api/John%20Lennon'){
     var html = fs.readFileSync(__dirname + '/beatle.html', 'utf8');
     res.writeHead(200, {'Content-Type':'text/html'})
     html = html.replace('{name}', beatles[0].name)
@@ -77,7 +91,7 @@ http.createServer((req, res)=>{
     html = html.replace('{text}', beatles[3].birthdate)
     html = html.replace('{imgRichard}', beatles[3].profilePic)
     res.end(html)
-  }
+  }*/
   else{
     res.writeHead(404); //Ponemos el status del response a 404: Not Found
     res.end(); //No devolvemos nada más que el estado.
