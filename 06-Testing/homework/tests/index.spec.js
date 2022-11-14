@@ -52,5 +52,68 @@ describe('Test de APIS', () => {
       }));
   });
 
+  describe('POST /numString', () => {
+    it('responds with 200', () => agent.post('/numString').expect(200));
+    it('responds with the num of chars', () =>
+      agent.post('/numString')
+        .send({string: 'hola'})
+        .then((res) => {
+          expect(res.body.result).toEqual(4);
+        })
+    );
+    it('responds with status 400 bad request', () =>
+      agent.post('/numString')
+        .send({string: ''})
+        .then((res) => {
+          expect(res.body.error).toEqual('400 bad request');
+        })
+    );
+    it('responds with status 400 bad request', () =>
+      agent.post('/numString')
+        .send({string: 4})
+        .then((res) => {
+          expect(res.body.error).toEqual('400 bad request');
+        })
+    );
+  });
+
+  describe('POST /pluck', () => {
+    it('responds with 200', () => agent.post('/pluck').expect(200));
+    let carros = [
+      {
+        "color": "morado",
+        "name": "minivan",
+        "tipo": "minivan",
+        "capacidad": 7
+      },
+      {
+        "color": "rojo",
+        "name": "ford",
+        "tipo": "camioneta",
+        "capacidad": 5
+      }
+    ]
+    it('responds with the num of chars', () =>
+      agent.post('/pluck')
+        .send({array: carros, string: 'minivan'})
+        .then((res) => {
+          expect(res.body.result).toEqual(carros[0]);
+        })
+    );
+    it('responds with status 400 bad request typeof array', () =>
+      agent.post('/pluck')
+        .send({array: 'hola', string: 'no'})
+        .then((res) => {
+          expect(res.body.error).toEqual('400 bad request');
+        })
+    );
+    it('responds with status 400 bad request string empty', () =>
+      agent.post('/pluck')
+        .send({array: [], string: ''})
+        .then((res) => {
+          expect(res.body.error).toEqual('400 bad request');
+        })
+    );
+  });
 });
 
