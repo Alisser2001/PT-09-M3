@@ -11,18 +11,37 @@ app.get('/', (req, res) => {
 
 app.get('/test', (req, res) => {
   res.send({
-    message: 'hola',
+    message: 'test',
   });
 });
 
 app.post('/sum', (req, res) => {
+  const {a, b} = req.body
   res.send({
-    result: req.body.a + req.body.b,
+    result: a+b,
   });
 });
 
+const sumArray=(arr, num)=>{
+  if(!Array.isArray(arr) || typeof num !== 'number'){
+    throw new TypeError('arr')
+  }
+  for (let i = 0; i < arr.length; i++) {
+    for (let j=1; j<arr.length; j++){
+      if (arr[i]+arr[j]==num){
+        return true
+      }
+    }
+  }
+  return false
+}
+
 app.post('/sumArray', (req, res) => {
-  if (req.body.array && req.body.num){
+  const {array, num} = req.body;
+  res.send({
+    result: sumArray(array, num)
+  })
+  /*if (req.body.array && req.body.num){
     res.send({
       result: true,
     });
@@ -30,12 +49,13 @@ app.post('/sumArray', (req, res) => {
     res.send({
       result: false,
     });
-  }
+  }*/
 });
 
 app.post('/product', (req, res) => {
+  const {a, b} = req.body
   res.send({
-    result: req.body.a * req.body.b,
+    result: a*b,
   });
 });
 
@@ -44,7 +64,7 @@ app.post('/numString', (req, res) => {
     return res.status(400).send({error: '400 bad request'})
   }
   let size = req.body.string.length
-  res.status(200).send({result: size})
+  res.send({result: size})
 });
 
 app.post('/pluck', (req, res) => {
@@ -52,7 +72,10 @@ app.post('/pluck', (req, res) => {
     return res.status(400).send({error: '400 bad request'})
   }
   let property = req.body.array.filter((obj) => obj.name === req.body.string)
-  res.status(200).send({result: property[0]})
+  if (property.length === 0){
+    return res.status(400).send({error: '400 bad request'})
+  }
+  res.send({result: property[0]})
 });
 
 module.exports = app; // Exportamos app para que supertest session la pueda ejecutar
